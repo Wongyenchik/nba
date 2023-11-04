@@ -346,28 +346,25 @@ def top3(data):
 # Filter the table based on the selected year
 
 # st.table(top3(data))
-from statsmodels.tsa.arima.model import ARIMA
+# from statsmodels.tsa.arima.model import ARIMA
+import joblib
 
 # Load ARIMA model
 def futuretop3():
     arima = pd.read_csv('final_arima_dataset.csv')
+    model = joblib.load('model.joblib')
     predictions_df = pd.DataFrame(columns=['Year', 'Player', 'Predicted_PPG'])
 
     # Loop through each unique player and fit an ARIMA model
     for player in arima['Player'].unique():
-        player_data = arima[arima['Player'] == player]['PPG']
+        # player_data = arima[arima['Player'] == player]['PPG']
 
         # Fit an ARIMA model (you may need to find the appropriate order)
-        p, d, q = 1, 1, 1  # Example order for the ARIMA model
-        model = sm.tsa.ARIMA(player_data, order=(p, d, q))
-        model_fit = model.fit()
-
-        # Make a prediction for the 2021 season
-        prediction_2021 = model_fit.get_forecast(steps=1).predicted_mean.values[0]
+        # prediction_2021 = model.forecast(steps=1, exog=player_data)[-1]
+        prediction_2021 = model.get_forecast(steps=1).predicted_mean.values[0]
 
         # Append the prediction to the DataFrame
         predictions_df = predictions_df.append({'Year': 2021, 'Player': player, 'PPG': prediction_2021}, ignore_index=True)
-
     # Sort the predictions in descending order to get the top 3 players for 2021
     top_3_players_2021 = predictions_df.sort_values(by='PPG', ascending=False).head(3)
     top_3_players_2021.reset_index(drop=True, inplace=True)
